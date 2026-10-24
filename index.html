@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>125 BN BSF MESS MANAGEMENT SYSTEM - BASANTAR WARRIORS</title>
+<title>125 BN BSF MULTI-MESS MANAGEMENT SYSTEM - BASANTAR WARRIORS</title>
 <style>
   :root {
     --bsf-red: #8B0000;
@@ -516,8 +516,9 @@
           <div class="panel-title">
             <span>DRY RATION (FIFO & MULTI-BATCH)</span>
             <div style="display:flex; gap:6px;">
+              <button class="btn btn-sm btn-gold" onclick="printDryRationReport()">PRINT DRY RATION</button>
               <button class="btn btn-sm btn-gold" onclick="addNewDryItem()">+ ADD ITEM</button>
-              <button class="btn btn-sm" onclick="rollOverDryRation()">ROLLOVER TO NEXT MONTH</button>
+              <button class="btn btn-sm" onclick="rollOverDryRation()">ROLLOVER</button>
             </div>
           </div>
           <div class="table-responsive">
@@ -548,7 +549,10 @@
 
         <!-- 4. FRESH RATION -->
         <div id="freshRationView" class="subview" style="display:none;">
-          <div class="panel-title"><span>FRESH RATION</span></div>
+          <div class="panel-title">
+            <span>FRESH RATION</span>
+            <button class="btn btn-gold btn-sm" onclick="printFreshRationReport()">PRINT FRESH RATION</button>
+          </div>
           <div class="table-responsive">
             <table class="military-table" style="max-width:900px;">
               <thead>
@@ -710,9 +714,9 @@
 <div class="modal-overlay" id="memberModalOverlay">
   <div class="modal-box">
     <div class="panel-title" style="margin-bottom:10px;"><span>MEMBER REGISTRATION FORM</span><button class="btn btn-danger btn-sm" onclick="closeMemberModal()">X</button></div>
-    <div class="form-group"><label>IRLA / REGT NO (कमा से अलग करें):</label><input type="text" id="modalRegt" class="form-control" placeholder="04125001, 04125002"></div>
+    <div class="form-group"><label>IRLA / REGT NO (कोमा से अलग करें):</label><input type="text" id="modalRegt" class="form-control" placeholder="04125001, 04125002"></div>
     <div class="form-group"><label>RANK:</label><input type="text" id="modalRank" class="form-control" placeholder="CT / HC / SI"></div>
-    <div class="form-group"><label>NAME(S) (कमा से अलग करें):</label><input type="text" id="modalName" class="form-control" placeholder="RAMESH SINGH, AMIT KUMAR"></div>
+    <div class="form-group"><label>NAME(S) (कोमा से अलग करें):</label><input type="text" id="modalName" class="form-control" placeholder="RAMESH SINGH, AMIT KUMAR"></div>
     <div class="form-group">
       <label>SELECT COY / SUB-UNIT:</label>
       <select id="modalCoy" class="form-control">
@@ -793,10 +797,10 @@ function createEmptyMessState() {
   };
 }
 
-const STORAGE_KEY = 'bsf_125_multimess_master_v19';
+const STORAGE_KEY = 'bsf_125_multimess_master_v20';
 
 function loadSavedState() {
-  const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('bsf_125_multimess_master_v18') || localStorage.getItem('bsf_125_mess_master_persistent_v13');
+  const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('bsf_125_multimess_master_v19') || localStorage.getItem('bsf_125_mess_master_persistent_v13');
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
@@ -804,7 +808,6 @@ function loadSavedState() {
         if (parsed["A Coy Mess"]) {
           globalMessStore = { ...globalMessStore, ...parsed };
         } else {
-          // Backward compatibility if single mess data was stored
           globalMessStore["A Coy Mess"] = { ...createEmptyMessState(), ...parsed };
         }
       }
@@ -1527,6 +1530,59 @@ function printFormattedMessCutting() {
 
   const tableHtml = `<table class="print-table"><thead><tr><th>REGT NO</th><th>RANK</th><th>NAME</th><th>COY</th><th style="text-align:right;">DIET</th><th style="text-align:right;">RATE</th><th style="text-align:right;">AMOUNT (₹)</th><th style="text-align:right;">ROUND OFF (₹)</th><th>REMARKS</th></tr></thead><tbody>${rowsHtml}</tbody><tfoot><tr><td colspan="4"><strong>COY TOTAL (${selectedCoy} - Active Only)</strong></td><td style="text-align:right;">${totDiets.toFixed(1)}</td><td></td><td style="text-align:right;">₹${totAmt.toFixed(2)}</td><td style="text-align:right; font-weight:900;">₹${totRound}</td><td></td></tr></tfoot></table>`;
   executePrint(`COY MESS CUTTING BILL - ${selectedCoy} (${activeMessName})`, tableHtml);
+}
+
+function printDryRation() {
+  let rowsHtml = "";
+  state.dryRation.forEach((r) => {
+    const calc = calculateMultiBatchFIFO(r);
+    if (calc.gQty <= 0 && calc.expQty <= 0 && calc.nextQty <= 0) return;
+    rowsHtml += `<tr>
+      <td><strong>${r.item}</strong></td>
+      <td style="text-align:right;">${calc.recQty.toFixed(1)}</td>
+      <td style="text-align:right;">₹${calc.recAmt.toFixed(2)}</td>
+      <td style="text-align:right;">${calc.purQty.toFixed(1)}</td>
+      <td style="text-align:right;">₹${calc.purAmt.toFixed(2)}</td>
+      <td style="text-align:right;">${calc.gQty.toFixed(1)}</td>
+      <td style="text-align:right;">₹${calc.gAmt.toFixed(2)}</td>
+      <td style="text-align:right;">${calc.expQty.toFixed(1)}</td>
+      <td style="text-align:right;">₹${calc.expAmt.toFixed(2)}</td>
+      <td style="text-align:right;">${calc.nextQty.toFixed(1)}</td>
+      <td style="text-align:right;">₹${calc.nextAmt.toFixed(2)}</td>
+    </tr>`;
+  });
+
+  const tableHtml = `<table class="print-table"><thead><tr>
+    <th>ITEM NAME</th>
+    <th style="text-align:right;">REC QTY</th><th style="text-align:right;">REC AMT</th>
+    <th style="text-align:right;">PUR QTY</th><th style="text-align:right;">PUR AMT</th>
+    <th style="text-align:right;">TOTAL QTY</th><th style="text-align:right;">TOTAL AMT</th>
+    <th style="text-align:right;">EXP QTY</th><th style="text-align:right;">EXP AMT</th>
+    <th style="text-align:right;">BAL QTY</th><th style="text-align:right;">BAL AMT</th>
+  </tr></thead><tbody>${rowsHtml}</tbody></table>`;
+  executePrint(`DRY RATION MONTHLY ACCOUNT (${activeMessName})`, tableHtml);
+}
+
+function printDryRationReport() { printDryRation(); }
+
+function printFreshRationReport() {
+  const rec = state.freshRationData.recAmt || 0;
+  const pur = state.freshRationData.purAmt || 0;
+  const next = state.freshRationData.nextAmt || 0;
+  const gTotal = rec + pur;
+  const exp = Math.max(0, gTotal - next);
+
+  const tableHtml = `<table class="print-table">
+    <thead><tr><th>DESCRIPTION / विवरण</th><th style="text-align:right;">AMOUNT (₹)</th></tr></thead>
+    <tbody>
+      <tr><td>a. Received from Last Month Balance</td><td style="text-align:right;">₹${rec.toFixed(2)}</td></tr>
+      <tr><td>b. Purchased During the Month</td><td style="text-align:right;">₹${pur.toFixed(2)}</td></tr>
+      <tr><td>c. Grand Total (Received + Purchased)</td><td style="text-align:right;">₹${gTotal.toFixed(2)}</td></tr>
+      <tr><td>d. Expenditure During the Month</td><td style="text-align:right; font-weight:900;">₹${exp.toFixed(2)}</td></tr>
+      <tr><td>e. Next Month Balance</td><td style="text-align:right;">₹${next.toFixed(2)}</td></tr>
+    </tbody>
+  </table>`;
+  executePrint(`FRESH RATION STATEMENT (${activeMessName})`, tableHtml);
 }
 
 function printCasualReport() {
