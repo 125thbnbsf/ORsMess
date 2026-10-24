@@ -383,17 +383,12 @@
 
     <!-- Month Ribbon -->
     <div class="cycle-bar">
-      <div>
+      <div style="display:flex; align-items:center; gap:8px;">
         <span class="cycle-title">CURRENT MESS BILLING MONTH:</span>
-        <select id="cycleSelector" class="form-control" style="width: auto; display: inline-block; padding: 4px 8px; margin-left: 8px; font-weight: 700;" onchange="onCycleChange()">
-          <option value="2026-09-21|2026-10-20">21 Sep 2026 to 20 Oct 2026 (30 Days)</option>
-          <option value="2026-10-21|2026-11-20">21 Oct 2026 to 20 Nov 2026 (31 Days)</option>
-          <option value="2026-11-21|2026-12-20">21 Nov 2026 to 20 Dec 2026 (30 Days)</option>
-          <option value="2026-12-21|2027-01-20">21 Dec 2026 to 20 Jan 2027 (31 Days)</option>
-          <option value="2027-01-21|2027-02-20">21 Jan 2027 to 20 Feb 2027 (31 Days)</option>
-          <option value="2027-02-21|2027-03-20">21 Feb 2027 to 20 Mar 2027 (28 Days)</option>
-          <option value="2027-03-21|2027-04-20">21 Mar 2027 to 20 Apr 2027 (31 Days)</option>
+        <select id="cycleSelector" class="form-control" style="width: auto; display: inline-block; padding: 4px 8px; font-weight: 700;" onchange="onCycleChange()">
+          <!-- Lifetime Dynamic Options will be injected here -->
         </select>
+        <button class="btn btn-sm btn-gold" onclick="addCustomCyclePrompt()">+ Custom Month</button>
       </div>
       <div style="font-size: 0.85rem; font-weight: 700; color: var(--og-dark);">
         Active Mess: <span id="stripActiveMessName" style="color:var(--bsf-red);">A Coy Mess</span> | 
@@ -714,9 +709,9 @@
 <div class="modal-overlay" id="memberModalOverlay">
   <div class="modal-box">
     <div class="panel-title" style="margin-bottom:10px;"><span>MEMBER REGISTRATION FORM</span><button class="btn btn-danger btn-sm" onclick="closeMemberModal()">X</button></div>
-    <div class="form-group"><label>IRLA / REGT NO (कोमा से अलग करें):</label><input type="text" id="modalRegt" class="form-control" placeholder="04125001, 04125002"></div>
+    <div class="form-group"><label>IRLA / REGT NO (कमा से अलग करें):</label><input type="text" id="modalRegt" class="form-control" placeholder="04125001, 04125002"></div>
     <div class="form-group"><label>RANK:</label><input type="text" id="modalRank" class="form-control" placeholder="CT / HC / SI"></div>
-    <div class="form-group"><label>NAME(S) (कोमा से अलग करें):</label><input type="text" id="modalName" class="form-control" placeholder="RAMESH SINGH, AMIT KUMAR"></div>
+    <div class="form-group"><label>NAME(S) (कमा से अलग करें):</label><input type="text" id="modalName" class="form-control" placeholder="RAMESH SINGH, AMIT KUMAR"></div>
     <div class="form-group">
       <label>SELECT COY / SUB-UNIT:</label>
       <select id="modalCoy" class="form-control">
@@ -797,10 +792,10 @@ function createEmptyMessState() {
   };
 }
 
-const STORAGE_KEY = 'bsf_125_multimess_master_v20';
+const STORAGE_KEY = 'bsf_125_multimess_master_v21';
 
 function loadSavedState() {
-  const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('bsf_125_multimess_master_v19') || localStorage.getItem('bsf_125_mess_master_persistent_v13');
+  const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('bsf_125_multimess_master_v20') || localStorage.getItem('bsf_125_mess_master_persistent_v13');
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
@@ -848,6 +843,7 @@ function handleFileImport(event) {
         if (state.currentUser) {
           initSystem();
         } else {
+          populateLifetimeCycleSelector();
           onCycleChange();
         }
         alert("डेटा सफलतापूर्वक रीस्टोर (Restore) कर लिया गया है!");
@@ -860,6 +856,73 @@ function handleFileImport(event) {
     }
   };
   reader.readAsText(file);
+}
+
+// Lifetime Dynamic Month Generator (2024 to 2050)
+function populateLifetimeCycleSelector() {
+  const sel = document.getElementById("cycleSelector");
+  if (!sel) return;
+  
+  // Save current selection if any
+  const currentVal = sel.value;
+  let html = "";
+  
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  
+  // Generate from 2024 to 2050
+  for (let yr = 2024; yr <= 2050; yr++) {
+    for (let m = 0; m < 12; m++) {
+      // Start: m-th month 21st
+      let startMonth = m;
+      let startYear = yr;
+      
+      // End: (m+1)-th month 20th
+      let endMonth = m + 1;
+      let endYear = yr;
+      if (endMonth > 11) {
+        endMonth = 0;
+        endYear = yr + 1;
+      }
+      
+      let sDateStr = `${startYear}-${String(startMonth + 1).padStart(2, '0')}-21`;
+      let eDateStr = `${endYear}-${String(endMonth + 1).padStart(2, '0')}-20`;
+      
+      let valKey = `${sDateStr}|${eDateStr}`;
+      let label = `21 ${monthNames[startMonth]} ${startYear} to 20 ${monthNames[endMonth]} ${endYear}`;
+      
+      html += `<option value="${valKey}">${label}</option>`;
+    }
+  }
+  
+  sel.innerHTML = html;
+  
+  // Restore selection or default to current active
+  if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) {
+    sel.value = currentVal;
+  } else {
+    let defaultKey = `${state.cycleStartDate}|${state.cycleEndDate}`;
+    if (sel.querySelector(`option[value="${defaultKey}"]`)) {
+      sel.value = defaultKey;
+    }
+  }
+}
+
+function addCustomCyclePrompt() {
+  const s = prompt("Enter Start Date (YYYY-MM-DD e.g. 2026-09-21):", "2026-09-21");
+  if (!s) return;
+  const e = prompt("Enter End Date (YYYY-MM-DD e.g. 2026-10-20):", "2026-10-20");
+  if (!e) return;
+  
+  const valKey = `${s}|${e}`;
+  const sel = document.getElementById("cycleSelector");
+  if (sel) {
+    let opt = document.createElement("option");
+    opt.value = valKey;
+    opt.innerText = `${s} to ${e}`;
+    sel.insertBefore(opt, sel.firstChild);
+    sel.value = valKey;
+    onCycleChange();
+  }
 }
 
 function getDaysBetween(startStr, endStr) {
@@ -881,7 +944,7 @@ function getCycleDates() {
 
 function onCycleChange() {
   const sel = document.getElementById("cycleSelector");
-  if (!sel) return;
+  if (!sel || !sel.value) return;
   const val = sel.value;
   const parts = val.split("|");
   state.cycleStartDate = parts[0];
@@ -918,26 +981,22 @@ function onCycleChange() {
   const calcRate = document.getElementById("cfgCalculatedRate");
   const rateText = document.getElementById("stripRateText");
   const dashRate = document.getElementById("dashRate");
-  const sumL = document.getElementById("sum_l");
 
   if (calcRate) calcRate.value = `₹${state.dailyRate.toFixed(2)}`;
   if (rateText) rateText.innerText = `₹${state.dailyRate.toFixed(2)} / Day`;
   if (dashRate) dashRate.innerText = `₹${state.dailyRate.toFixed(2)}`;
-  if (sumL) sumL.innerText = `₹${state.dailyRate.toFixed(2)}`;
 
   const rA = document.getElementById("casualRateA");
   const rB = document.getElementById("casualRateB");
   const rC = document.getElementById("casualRateC");
   const rD = document.getElementById("casualRateD");
   const rE = document.getElementById("casualRateE");
-  const sumM = document.getElementById("sum_m");
 
   if (rA) rA.value = state.casualRates.a;
   if (rB) rB.value = state.casualRates.b;
   if (rC) rC.value = state.casualRates.c;
   if (rD) rD.value = state.casualRates.d;
   if (rE) rE.value = state.casualRates.e;
-  if (sumM) sumM.innerText = `₹${state.casualRates.e.toFixed(2)}`;
 
   renderAttendanceMatrix();
   recalcAll();
@@ -964,8 +1023,6 @@ function saveAndLockRates() {
   document.getElementById("cfgCalculatedRate").value = `₹${newRate.toFixed(2)}`;
   document.getElementById("stripRateText").innerText = `₹${newRate.toFixed(2)} / Day`;
   document.getElementById("dashRate").innerText = `₹${newRate.toFixed(2)}`;
-  if (document.getElementById("sum_l")) document.getElementById("sum_l").innerText = `₹${newRate.toFixed(2)}`;
-  if (document.getElementById("sum_m")) document.getElementById("sum_m").innerText = `₹${state.casualRates.e.toFixed(2)}`;
 
   renderAttendanceMatrix();
   recalcAll();
@@ -1649,6 +1706,7 @@ function initSystem() {
   if (globalMessStore[activeMessName]) {
     state = globalMessStore[activeMessName];
   }
+  populateLifetimeCycleSelector();
   onCycleChange();
   renderMembers();
   renderDryRation();
@@ -1664,6 +1722,7 @@ window.onload = function() {
   if (globalMessStore[activeMessName]) {
     state = globalMessStore[activeMessName];
   }
+  populateLifetimeCycleSelector();
   onCycleChange();
 };
 </script>
