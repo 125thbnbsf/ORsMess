@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>125 BN BSF MULTI-MESS MANAGEMENT SYSTEM - BASANTAR WARRIORS</title>
+<title>125 BN BSF GOOGLE SHEET SYNCED MESS SYSTEM</title>
 <style>
   :root {
     --bsf-red: #8B0000;
@@ -144,7 +144,7 @@
 
   /* Login Card */
   .login-card {
-    max-width: 460px;
+    max-width: 480px;
     margin: 60px auto;
     background: var(--white);
     border: 2px solid var(--og-border);
@@ -315,7 +315,7 @@
 <header class="military-header">
   <div class="header-content">
     <div class="script-title">Basantar Warriors – Courage Beyond Limits….</div>
-    <div class="sub-title">125 BN BSF MULTI-MESS MANAGEMENT SYSTEM</div>
+    <div class="sub-title">125 BN BSF GOOGLE SHEET SYNCED MESS SYSTEM</div>
     <div class="header-cycle-badge" id="currentCycleBadge">
       MESS MONTH: 21 SEP – 20 OCT 2026 (30 DAYS)
     </div>
@@ -332,7 +332,7 @@
   </div>
   <div class="auth-actions">
     <button class="btn btn-sm btn-gold" onclick="changeMyPasswordPrompt()">CHANGE PASSWORD</button>
-    <button class="logout-btn" onclick="logout()">LOGOUT & AUTO-BACKUP</button>
+    <button class="logout-btn" onclick="logout()">LOGOUT & SYNC SHEET</button>
   </div>
 </div>
 
@@ -341,7 +341,7 @@
 
   <!-- 1. LOGIN SCREEN -->
   <section id="loginSection" class="login-card">
-    <div class="login-header">MESS AUTHORIZED ACCESS</div>
+    <div class="login-header">GOOGLE SHEET SYNC - MESS ACCESS</div>
     <div class="login-body">
       <div class="form-group" style="text-align:center; margin-bottom:14px; background:#F2F5EB; padding:10px; border-radius:4px; border:1px solid #C8CEB5;">
         <label style="font-size:0.85rem; margin-bottom:6px;">वैकल्पिक बैकअप फाइल:</label>
@@ -373,7 +373,7 @@
         <input type="password" maxlength="4" class="form-control" id="loginPin" placeholder="Enter PIN">
       </div>
       <button class="btn btn-gold" style="width:100%; justify-content:center;" onclick="handleLogin()">
-        UNLOCK SYSTEM
+        🟢 SYNC FROM SHEET & UNLOCK
       </button>
     </div>
   </section>
@@ -386,7 +386,7 @@
       <div style="display:flex; align-items:center; gap:8px;">
         <span class="cycle-title">CURRENT MESS BILLING MONTH:</span>
         <select id="cycleSelector" class="form-control" style="width: auto; display: inline-block; padding: 4px 8px; font-weight: 700;" onchange="onCycleChange()">
-          <!-- Lifetime Dynamic Options will be injected here -->
+          <!-- Lifetime Dynamic Options -->
         </select>
         <button class="btn btn-sm btn-gold" onclick="addCustomCyclePrompt()">+ Custom Month</button>
       </div>
@@ -677,10 +677,10 @@
           </div>
           <div id="officerAuditPanel" style="display:none;">
             <div style="background:#FFF; padding:14px; border:1px solid #CCD4BF; border-radius:6px; margin-bottom:16px;">
-              <h4 style="color:var(--og-dark); margin-bottom:8px;">OFFICIAL GOOGLE DRIVE ARCHIVE:</h4>
+              <h4 style="color:var(--og-dark); margin-bottom:8px;">GOOGLE SHEET SYNC & DRIVE:</h4>
               <div style="display:flex; gap:10px;">
-                <button class="btn btn-gold" onclick="exportBackupJSON()">DOWNLOAD JSON BACKUP</button>
-                <button class="btn" onclick="importBackupPrompt()">RESTORE FROM BACKUP FILE</button>
+                <button class="btn btn-gold" onclick="forceSyncToSheet()">🟢 SYNC NOW TO SHEET</button>
+                <button class="btn" onclick="exportBackupJSON()">DOWNLOAD JSON BACKUP</button>
                 <button class="btn" onclick="openDriveLink()">OPEN GOOGLE DRIVE</button>
               </div>
             </div>
@@ -709,9 +709,9 @@
 <div class="modal-overlay" id="memberModalOverlay">
   <div class="modal-box">
     <div class="panel-title" style="margin-bottom:10px;"><span>MEMBER REGISTRATION FORM</span><button class="btn btn-danger btn-sm" onclick="closeMemberModal()">X</button></div>
-    <div class="form-group"><label>IRLA / REGT NO (कमा से अलग करें):</label><input type="text" id="modalRegt" class="form-control" placeholder="04125001, 04125002"></div>
+    <div class="form-group"><label>IRLA / REGT NO (कोमा से अलग करें):</label><input type="text" id="modalRegt" class="form-control" placeholder="04125001, 04125002"></div>
     <div class="form-group"><label>RANK:</label><input type="text" id="modalRank" class="form-control" placeholder="CT / HC / SI"></div>
-    <div class="form-group"><label>NAME(S) (कमा से अलग करें):</label><input type="text" id="modalName" class="form-control" placeholder="RAMESH SINGH, AMIT KUMAR"></div>
+    <div class="form-group"><label>NAME(S) (कोमा से अलग करें):</label><input type="text" id="modalName" class="form-control" placeholder="RAMESH SINGH, AMIT KUMAR"></div>
     <div class="form-group">
       <label>SELECT COY / SUB-UNIT:</label>
       <select id="modalCoy" class="form-control">
@@ -753,6 +753,9 @@
 </footer>
 
 <script>
+// Yahan apna Google Apps Script Web App URL paste karein:
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyB8x3XpoeKW0qiLK5SbdlntzAn7K-OoWIZn-DITqiecUkT_LwfvVIc9Oc0pNC8cp8l/exec";
+
 let globalMessStore = {
   "A Coy Mess": createEmptyMessState(),
   "B Coy Mess": createEmptyMessState(),
@@ -792,33 +795,70 @@ function createEmptyMessState() {
   };
 }
 
-const STORAGE_KEY = 'bsf_125_multimess_master_v21';
+// Load from Google Sheet
+async function loadFromGoogleSheet(callback) {
+  if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_GOOGLE_APPS_SCRIPT")) {
+    loadSavedStateLocally();
+    if (callback) callback();
+    return;
+  }
+  try {
+    const response = await fetch(GOOGLE_SCRIPT_URL);
+    if (response.ok) {
+      const resText = await response.text();
+      const parsed = JSON.parse(resText);
+      if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+        globalMessStore = Object.assign({}, globalMessStore, parsed);
+        if (globalMessStore[activeMessName]) {
+          state = globalMessStore[activeMessName];
+        }
+      }
+    }
+  } catch(e) {
+    console.error("Sheet load error, using local fallback:", e);
+    loadSavedStateLocally();
+  }
+  if (callback) callback();
+}
 
-function loadSavedState() {
-  const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('bsf_125_multimess_master_v20') || localStorage.getItem('bsf_125_mess_master_persistent_v13');
+// Save to Google Sheet
+async function saveToGoogleSheet() {
+  globalMessStore[activeMessName] = state;
+  localStorage.setItem('bsf_sheet_multimess_backup', JSON.stringify(globalMessStore));
+
+  if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_GOOGLE_APPS_SCRIPT")) return;
+
+  try {
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(globalMessStore)
+    });
+  } catch(e) {
+    console.error("Sheet save error:", e);
+  }
+}
+
+function forceSyncToSheet() {
+  saveToGoogleSheet();
+  alert("डेटा सफलतापूर्वक Google Sheet पर सिंक (Sync) हो गया है!");
+}
+
+function loadSavedStateLocally() {
+  const saved = localStorage.getItem('bsf_sheet_multimess_backup');
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
       if (parsed && typeof parsed === 'object') {
-        if (parsed["A Coy Mess"]) {
-          globalMessStore = { ...globalMessStore, ...parsed };
-        } else {
-          globalMessStore["A Coy Mess"] = { ...createEmptyMessState(), ...parsed };
-        }
+        globalMessStore = { ...globalMessStore, ...parsed };
       }
     } catch(e) {
-      console.error("Error loading multi-mess storage:", e);
+      console.error("Local storage load error:", e);
     }
   }
 }
 
 function saveState() {
-  try {
-    globalMessStore[activeMessName] = state;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(globalMessStore));
-  } catch(e) {
-    console.error("Error saving storage:", e);
-  }
+  saveToGoogleSheet();
 }
 
 function importBackupPrompt() {
@@ -862,41 +902,26 @@ function handleFileImport(event) {
 function populateLifetimeCycleSelector() {
   const sel = document.getElementById("cycleSelector");
   if (!sel) return;
-  
-  // Save current selection if any
   const currentVal = sel.value;
   let html = "";
-  
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   
-  // Generate from 2024 to 2050
   for (let yr = 2024; yr <= 2050; yr++) {
     for (let m = 0; m < 12; m++) {
-      // Start: m-th month 21st
-      let startMonth = m;
-      let startYear = yr;
-      
-      // End: (m+1)-th month 20th
-      let endMonth = m + 1;
-      let endYear = yr;
-      if (endMonth > 11) {
-        endMonth = 0;
-        endYear = yr + 1;
-      }
+      let startMonth = m, startYear = yr;
+      let endMonth = m + 1, endYear = yr;
+      if (endMonth > 11) { endMonth = 0; endYear = yr + 1; }
       
       let sDateStr = `${startYear}-${String(startMonth + 1).padStart(2, '0')}-21`;
       let eDateStr = `${endYear}-${String(endMonth + 1).padStart(2, '0')}-20`;
       
       let valKey = `${sDateStr}|${eDateStr}`;
       let label = `21 ${monthNames[startMonth]} ${startYear} to 20 ${monthNames[endMonth]} ${endYear}`;
-      
       html += `<option value="${valKey}">${label}</option>`;
     }
   }
-  
   sel.innerHTML = html;
   
-  // Restore selection or default to current active
   if (currentVal && sel.querySelector(`option[value="${currentVal}"]`)) {
     sel.value = currentVal;
   } else {
@@ -959,13 +984,11 @@ function onCycleChange() {
   const stripText = document.getElementById("stripCycleText");
   const spanText = document.getElementById("cycleSpanText");
   const daysCount = document.getElementById("cycleDaysCount");
-  const cfgDays = document.getElementById("cfgCycleDays");
 
   if (badge) badge.innerText = `MESS MONTH: ${cycleLabel.toUpperCase()} (${state.cycleDays} DAYS)`;
   if (stripText) stripText.innerText = `${cycleLabel} (${state.cycleDays} Days)`;
   if (spanText) spanText.innerText = cycleLabel;
   if (daysCount) daysCount.innerText = state.cycleDays;
-  if (cfgDays) cfgDays.value = state.cycleDays;
 
   if (state.cycleRates[val] !== undefined) {
     state.dailyRate = state.cycleRates[val];
@@ -1032,57 +1055,58 @@ function saveAndLockRates() {
 }
 
 function handleLogin() {
-  loadSavedState();
-  const selectedMess = document.getElementById("loginMessSelect").value;
-  activeMessName = selectedMess;
-  
-  if (!globalMessStore[activeMessName]) {
-    globalMessStore[activeMessName] = createEmptyMessState();
-  }
-  state = globalMessStore[activeMessName];
-
-  const role = document.getElementById("loginRole").value;
-  const pin = document.getElementById("loginPin").value;
-  const now = Date.now();
-
-  if (state.lockoutExpiry[role] && now < state.lockoutExpiry[role]) {
-    const minsLeft = Math.ceil((state.lockoutExpiry[role] - now) / 60000);
-    alert(`ACCOUNT LOCKED!\nगलत पासवर्ड दर्ज करने के कारण यह अकाउंट ${minsLeft} मिनट के लिए लॉक है।`);
-    return;
-  }
-
-  const correctPin = state.passwords[role] || "1234";
-  if (pin === correctPin) {
-    state.loginAttempts[role] = 0;
-    state.currentUser = role;
-    document.getElementById("loginSection").style.display = "none";
-    document.getElementById("workspaceSection").style.display = "block";
-    document.getElementById("authStrip").style.display = "flex";
-    document.getElementById("loggedRoleText").innerText = `MESS ${role}`;
-    document.getElementById("activeMessLabel").innerText = activeMessName;
-    document.getElementById("stripActiveMessName").innerText = activeMessName;
+  loadFromGoogleSheet(() => {
+    const selectedMess = document.getElementById("loginMessSelect").value;
+    activeMessName = selectedMess;
     
-    if (role === "OFFICER") {
-      document.getElementById("officerAuditPanel").style.display = "block";
-      document.getElementById("nonOfficerAuditMsg").style.display = "none";
-    } else {
-      document.getElementById("officerAuditPanel").style.display = "none";
-      document.getElementById("nonOfficerAuditMsg").style.display = "block";
+    if (!globalMessStore[activeMessName]) {
+      globalMessStore[activeMessName] = createEmptyMessState();
+    }
+    state = globalMessStore[activeMessName];
+
+    const role = document.getElementById("loginRole").value;
+    const pin = document.getElementById("loginPin").value;
+    const now = Date.now();
+
+    if (state.lockoutExpiry[role] && now < state.lockoutExpiry[role]) {
+      const minsLeft = Math.ceil((state.lockoutExpiry[role] - now) / 60000);
+      alert(`ACCOUNT LOCKED!\nगलत पासवर्ड दर्ज करने के कारण यह अकाउंट ${minsLeft} मिनट के लिए लॉक है।`);
+      return;
     }
 
-    logAudit("LOGIN", `Logged in as MESS ${role} for ${activeMessName}`);
-    initSystem();
-  } else {
-    state.loginAttempts[role] = (state.loginAttempts[role] || 0) + 1;
-    const remaining = 5 - state.loginAttempts[role];
-    if (state.loginAttempts[role] >= 5) {
-      state.lockoutExpiry[role] = now + (24 * 60 * 60 * 1000);
-      saveState();
-      alert("SECURITY LOCKOUT!\n5 बार गलत पासवर्ड दर्ज करने के कारण अकाउंट 24 घंटे के लिए लॉक कर दिया गया है।");
+    const correctPin = state.passwords[role] || "1234";
+    if (pin === correctPin) {
+      state.loginAttempts[role] = 0;
+      state.currentUser = role;
+      document.getElementById("loginSection").style.display = "none";
+      document.getElementById("workspaceSection").style.display = "block";
+      document.getElementById("authStrip").style.display = "flex";
+      document.getElementById("loggedRoleText").innerText = `MESS ${role}`;
+      document.getElementById("activeMessLabel").innerText = activeMessName;
+      document.getElementById("stripActiveMessName").innerText = activeMessName;
+      
+      if (role === "OFFICER") {
+        document.getElementById("officerAuditPanel").style.display = "block";
+        document.getElementById("nonOfficerAuditMsg").style.display = "none";
+      } else {
+        document.getElementById("officerAuditPanel").style.display = "none";
+        document.getElementById("nonOfficerAuditMsg").style.display = "block";
+      }
+
+      logAudit("LOGIN", `Logged in as MESS ${role} for ${activeMessName}`);
+      initSystem();
     } else {
-      alert(`गलत पासवर्ड! शेष प्रयास: ${remaining}`);
+      state.loginAttempts[role] = (state.loginAttempts[role] || 0) + 1;
+      const remaining = 5 - state.loginAttempts[role];
+      if (state.loginAttempts[role] >= 5) {
+        state.lockoutExpiry[role] = now + (24 * 60 * 60 * 1000);
+        saveState();
+        alert("SECURITY LOCKOUT!\n5 बार गलत पासवर्ड दर्ज करने के कारण अकाउंट 24 घंटे के लिए लॉक कर दिया गया है।");
+      } else {
+        alert(`गलत पासवर्ड! शेष प्रयास: ${remaining}`);
+      }
     }
-  }
+  });
 }
 
 function changeMyPasswordPrompt() {
@@ -1104,7 +1128,7 @@ function changeMyPasswordPrompt() {
 }
 
 function logout() {
-  exportBackupJSON();
+  saveToGoogleSheet();
   state.currentUser = null;
   document.getElementById("workspaceSection").style.display = "none";
   document.getElementById("authStrip").style.display = "none";
@@ -1702,28 +1726,30 @@ function renderAuditLogs() {
 }
 
 function initSystem() {
-  loadSavedState();
-  if (globalMessStore[activeMessName]) {
-    state = globalMessStore[activeMessName];
-  }
-  populateLifetimeCycleSelector();
-  onCycleChange();
-  renderMembers();
-  renderDryRation();
-  updateFreshSummary();
-  renderCasualAndPrisoners();
-  renderAttendanceMatrix();
-  renderAuditLogs();
-  recalcAll();
+  loadFromGoogleSheet(() => {
+    if (globalMessStore[activeMessName]) {
+      state = globalMessStore[activeMessName];
+    }
+    populateLifetimeCycleSelector();
+    onCycleChange();
+    renderMembers();
+    renderDryRation();
+    updateFreshSummary();
+    renderCasualAndPrisoners();
+    renderAttendanceMatrix();
+    renderAuditLogs();
+    recalcAll();
+  });
 }
 
 window.onload = function() {
-  loadSavedState();
-  if (globalMessStore[activeMessName]) {
-    state = globalMessStore[activeMessName];
-  }
-  populateLifetimeCycleSelector();
-  onCycleChange();
+  // Silent background sync check on load
+  loadFromGoogleSheet(() => {
+    if (globalMessStore[activeMessName]) {
+      state = globalMessStore[activeMessName];
+    }
+    populateLifetimeCycleSelector();
+  });
 };
 </script>
 </body>
