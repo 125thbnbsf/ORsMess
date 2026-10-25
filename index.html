@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>125 BN BSF GOOGLE SHEET SYNCED MESS SYSTEM</title>
+<title>125 BN BSF MESS MANAGEMENT SYSTEM - BASANTAR WARRIORS</title>
 <style>
   :root {
     --bsf-red: #8B0000;
@@ -315,7 +315,7 @@
 <header class="military-header">
   <div class="header-content">
     <div class="script-title">Basantar Warriors – Courage Beyond Limits….</div>
-    <div class="sub-title">125 BN BSF GOOGLE SHEET SYNCED MESS SYSTEM</div>
+    <div class="sub-title">125 BN BSF MESS MANAGEMENT SYSTEM</div>
     <div class="header-cycle-badge" id="currentCycleBadge">
       MESS MONTH: 21 SEP – 20 OCT 2026 (30 DAYS)
     </div>
@@ -341,7 +341,7 @@
 
   <!-- 1. LOGIN SCREEN -->
   <section id="loginSection" class="login-card">
-    <div class="login-header">GOOGLE SHEET SYNC - MESS ACCESS</div>
+    <div class="login-header">MESS AUTHORIZED ACCESS</div>
     <div class="login-body">
       <div class="form-group" style="text-align:center; margin-bottom:14px; background:#F2F5EB; padding:10px; border-radius:4px; border:1px solid #C8CEB5;">
         <label style="font-size:0.85rem; margin-bottom:6px;">वैकल्पिक बैकअप फाइल:</label>
@@ -369,11 +369,11 @@
         </select>
       </div>
       <div class="form-group">
-        <label>SECURITY 4-DIGIT PIN (DEFAULT: 1234):</label>
+        <label>SECURITY 4-DIGIT PIN</label>
         <input type="password" maxlength="4" class="form-control" id="loginPin" placeholder="Enter PIN">
       </div>
       <button class="btn btn-gold" style="width:100%; justify-content:center;" onclick="handleLogin()">
-        🟢 SYNC FROM SHEET & UNLOCK
+        UNLOCK SYSTEM
       </button>
     </div>
   </section>
@@ -386,7 +386,7 @@
       <div style="display:flex; align-items:center; gap:8px;">
         <span class="cycle-title">CURRENT MESS BILLING MONTH:</span>
         <select id="cycleSelector" class="form-control" style="width: auto; display: inline-block; padding: 4px 8px; font-weight: 700;" onchange="onCycleChange()">
-          <!-- Lifetime Dynamic Options -->
+          <!-- Lifetime Options -->
         </select>
         <button class="btn btn-sm btn-gold" onclick="addCustomCyclePrompt()">+ Custom Month</button>
       </div>
@@ -426,11 +426,11 @@
           </button>
           <button class="cp-btn" onclick="switchView('rateView')">
             <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 2h2v3h-2V5zm-4 0h2v3H8V5zm0 5h2v3H8v-3zm0 5h2v3H8v-3zm4 3v-3h2v3h-2zm0-5v-3h2v3h-2zm4 5v-3h2v3h-2zm0-5v-3h2v3h-2zm0-5h2v3H8V5z"/></svg>
-            <span>RMA & RATES</span>
+            <span>RMA & CASUAL RATES</span>
           </button>
           <button class="cp-btn" onclick="switchView('casualPrisonerView')">
             <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-            <span>CASUAL & PRISONER</span>
+            <span>CASUAL & PRISONER DIETS</span>
           </button>
           <button class="cp-btn" onclick="switchView('summaryView')">
             <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
@@ -488,7 +488,7 @@
               <select id="attendanceCoyFilter" class="form-control" style="width:160px; padding:4px 8px;" onchange="renderAttendanceMatrix()">
                 <option value="A COY">A COY</option><option value="B COY">B COY</option><option value="C COY">C COY</option><option value="D COY">D COY</option>
                 <option value="E COY">E COY</option><option value="F COY">F COY</option><option value="G COY">G COY</option><option value="HQ COY">HQ COY</option>
-                <option value="SP COY">SP COY</option><option value="MIN STAFF">MIN STAFF</option><option value="SIGNAL PL">SIGNAL PL</option><option value="MT PL">MT PL</option><option value="MEDICAL">MEDICAL</option>
+                <option value="SP COY">SP COY</option><option value="MIN STAFF">MIN STAFF</option><option value="SIGNAL PL">SIGNAL PL</option><option value="MT PL">MT PL</option><option value="MEDICAL">MEDICAL</option><option value="OTHERS">OTHERS</option>
               </select>
             </div>
             <div style="display:flex; gap:6px;">
@@ -585,7 +585,7 @@
           </div>
         </div>
 
-        <!-- 6. RMA & RATES -->
+        <!-- 6. RMA & CASUAL RATES -->
         <div id="rateView" class="subview" style="display:none;">
           <div class="panel-title"><span>RMA & CASUAL RATES MANAGEMENT</span></div>
           <div style="background:#FFF; padding:20px; border:1px solid #CCD4BF; border-radius:6px; max-width:800px;">
@@ -612,7 +612,7 @@
           </div>
         </div>
 
-        <!-- 7. CASUAL & PRISONER -->
+        <!-- 7. CASUAL & PRISONER DIETS -->
         <div id="casualPrisonerView" class="subview" style="display:none;">
           <div class="panel-title"><span>CASUAL DIET & PRISONER (RI) REGISTERS</span></div>
           <div style="margin-bottom:24px;">
@@ -679,7 +679,7 @@
             <div style="background:#FFF; padding:14px; border:1px solid #CCD4BF; border-radius:6px; margin-bottom:16px;">
               <h4 style="color:var(--og-dark); margin-bottom:8px;">GOOGLE SHEET SYNC & DRIVE:</h4>
               <div style="display:flex; gap:10px;">
-                <button class="btn btn-gold" onclick="forceSyncToSheet()">🟢 SYNC NOW TO SHEET</button>
+                <button class="btn btn-gold" onclick="forceSyncToSheet()">SYNC NOW TO SHEET</button>
                 <button class="btn" onclick="exportBackupJSON()">DOWNLOAD JSON BACKUP</button>
                 <button class="btn" onclick="openDriveLink()">OPEN GOOGLE DRIVE</button>
               </div>
@@ -717,7 +717,7 @@
       <select id="modalCoy" class="form-control">
         <option value="A COY">A COY</option><option value="B COY">B COY</option><option value="C COY">C COY</option><option value="D COY">D COY</option>
         <option value="E COY">E COY</option><option value="F COY">F COY</option><option value="G COY">G COY</option><option value="HQ COY">HQ COY</option>
-        <option value="SP COY">SP COY</option><option value="MIN STAFF">MIN STAFF</option><option value="SIGNAL PL">SIGNAL PL</option><option value="MT PL">MT PL</option><option value="MEDICAL">MEDICAL</option>
+        <option value="SP COY">SP COY</option><option value="MIN STAFF">MIN STAFF</option><option value="SIGNAL PL">SIGNAL PL</option><option value="MT PL">MT PL</option><option value="MEDICAL">MEDICAL</option><option value="OTHERS">OTHERS</option>
       </select>
     </div>
     <button class="btn btn-gold" style="width:100%; justify-content:center;" onclick="submitMemberModal()">REGISTER & SYNC</button>
@@ -754,7 +754,7 @@
 
 <script>
 // Yahan apna Google Apps Script Web App URL paste karein:
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydHTilvca8waj19tX5zc_PUnKdEdZOVQtyBaOR9pV_MU_0bPtwwpZxbAb4CYbXqFQ/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxq1mU3MGEJtM3f56MI7LJvEl-5mxeoN9d-5h_ReFB_BbmLn19bMkEwkCbPADDhbKo/exec";
 
 let globalMessStore = {
   "A Coy Mess": createEmptyMessState(),
@@ -795,52 +795,84 @@ function createEmptyMessState() {
   };
 }
 
-// Load from Google Sheet
-async function loadFromGoogleSheet(callback) {
-  if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_GOOGLE_APPS_SCRIPT")) {
-    loadSavedStateLocally();
-    if (callback) callback();
-    return;
-  }
-  try {
-    const response = await fetch(GOOGLE_SCRIPT_URL);
-    if (response.ok) {
-      const resText = await response.text();
-      const parsed = JSON.parse(resText);
+// Offline-First Sync Engine with Row-by-Row Sheet Append
+let isOnline = navigator.onLine;
+
+window.addEventListener('online', () => {
+  isOnline = true;
+  syncPendingDataToSheet();
+});
+
+window.addEventListener('offline', () => {
+  isOnline = false;
+});
+
+function loadFromGoogleSheet(callback) {
+  loadSavedStateLocally();
+  if (callback) callback();
+
+  if (!navigator.onLine) return;
+  if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_GOOGLE_APPS_SCRIPT")) return;
+
+  fetch(GOOGLE_SCRIPT_URL)
+    .then(response => response.json())
+    .then(parsed => {
       if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
         globalMessStore = Object.assign({}, globalMessStore, parsed);
         if (globalMessStore[activeMessName]) {
           state = globalMessStore[activeMessName];
         }
+        saveSavedStateLocally();
+        if (callback) callback();
       }
-    }
-  } catch(e) {
-    console.error("Sheet load error, using local fallback:", e);
-    loadSavedStateLocally();
-  }
-  if (callback) callback();
+    })
+    .catch(e => console.log("Offline mode: Sheet fetch skipped."));
 }
 
-// Save to Google Sheet
-async function saveToGoogleSheet() {
+function saveToGoogleSheet() {
   globalMessStore[activeMessName] = state;
-  localStorage.setItem('bsf_sheet_multimess_backup', JSON.stringify(globalMessStore));
+  saveSavedStateLocally();
 
   if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_GOOGLE_APPS_SCRIPT")) return;
 
-  try {
-    await fetch(GOOGLE_SCRIPT_URL, {
-      method: 'POST',
-      body: JSON.stringify(globalMessStore)
-    });
-  } catch(e) {
-    console.error("Sheet save error:", e);
+  if (navigator.onLine) {
+    try {
+      const payload = JSON.stringify(globalMessStore);
+      const syncUrl = `${GOOGLE_SCRIPT_URL}?data=${encodeURIComponent(payload)}`;
+      fetch(syncUrl, { mode: 'no-cors' }).catch(() => {
+        localStorage.setItem('bsf_pending_sync', 'true');
+      });
+    } catch(e) {
+      localStorage.setItem('bsf_pending_sync', 'true');
+    }
+  } else {
+    localStorage.setItem('bsf_pending_sync', 'true');
+  }
+}
+
+function syncPendingDataToSheet() {
+  if (localStorage.getItem('bsf_pending_sync') === 'true') {
+    globalMessStore[activeMessName] = state;
+    const payload = JSON.stringify(globalMessStore);
+    const syncUrl = `${GOOGLE_SCRIPT_URL}?data=${encodeURIComponent(payload)}`;
+    fetch(syncUrl, { mode: 'no-cors' })
+      .then(() => {
+        localStorage.removeItem('bsf_pending_sync');
+        console.log("Pending offline data successfully appended to Google Sheet!");
+      })
+      .catch(() => {});
   }
 }
 
 function forceSyncToSheet() {
   saveToGoogleSheet();
-  alert("डेटा सफलतापूर्वक Google Sheet पर सिंक (Sync) हो गया है!");
+  alert("डेटा सफलतापूर्वक Google Sheet पर सिंक हो गया है!");
+}
+
+function saveSavedStateLocally() {
+  try {
+    localStorage.setItem('bsf_sheet_multimess_backup', JSON.stringify(globalMessStore));
+  } catch(e) {}
 }
 
 function loadSavedStateLocally() {
@@ -851,9 +883,7 @@ function loadSavedStateLocally() {
       if (parsed && typeof parsed === 'object') {
         globalMessStore = { ...globalMessStore, ...parsed };
       }
-    } catch(e) {
-      console.error("Local storage load error:", e);
-    }
+    } catch(e) {}
   }
 }
 
@@ -1743,12 +1773,12 @@ function initSystem() {
 }
 
 window.onload = function() {
-  // Silent background sync check on load
   loadFromGoogleSheet(() => {
     if (globalMessStore[activeMessName]) {
       state = globalMessStore[activeMessName];
     }
     populateLifetimeCycleSelector();
+    onCycleChange();
   });
 };
 </script>
