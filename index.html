@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>125 BN BSF MESS MANAGEMENT SYSTEM - BASANTAR WARRIORS</title>
+<title>125 BN BSF MULTI-MESS MANAGEMENT SYSTEM - BASANTAR WARRIORS</title>
 <style>
   :root {
     --bsf-red: #8B0000;
@@ -315,7 +315,7 @@
 <header class="military-header">
   <div class="header-content">
     <div class="script-title">Basantar Warriors – Courage Beyond Limits….</div>
-    <div class="sub-title">125 BN BSF MESS MANAGEMENT SYSTEM</div>
+    <div class="sub-title">125 BN BSF MULTI-MESS MANAGEMENT SYSTEM</div>
     <div class="header-cycle-badge" id="currentCycleBadge">
       MESS MONTH: 21 SEP – 20 OCT 2026 (30 DAYS)
     </div>
@@ -369,11 +369,11 @@
         </select>
       </div>
       <div class="form-group">
-        <label>SECURITY 4-DIGIT PIN</label>
+        <label>SECURITY 4-DIGIT PIN (DEFAULT: 1234):</label>
         <input type="password" maxlength="4" class="form-control" id="loginPin" placeholder="Enter PIN">
       </div>
       <button class="btn btn-gold" style="width:100%; justify-content:center;" onclick="handleLogin()">
-        UNLOCK SYSTEM
+        🟢 UNLOCK SYSTEM
       </button>
     </div>
   </section>
@@ -426,11 +426,11 @@
           </button>
           <button class="cp-btn" onclick="switchView('rateView')">
             <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 2h2v3h-2V5zm-4 0h2v3H8V5zm0 5h2v3H8v-3zm0 5h2v3H8v-3zm4 3v-3h2v3h-2zm0-5v-3h2v3h-2zm4 5v-3h2v3h-2zm0-5v-3h2v3h-2zm0-5h2v3H8V5z"/></svg>
-            <span>RMA & CASUAL RATES</span>
+            <span>RMA & RATES</span>
           </button>
           <button class="cp-btn" onclick="switchView('casualPrisonerView')">
             <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-            <span>CASUAL & PRISONER DIETS</span>
+            <span>CASUAL & PRISONER</span>
           </button>
           <button class="cp-btn" onclick="switchView('summaryView')">
             <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
@@ -585,7 +585,7 @@
           </div>
         </div>
 
-        <!-- 6. RMA & CASUAL RATES -->
+        <!-- 6. RMA & RATES -->
         <div id="rateView" class="subview" style="display:none;">
           <div class="panel-title"><span>RMA & CASUAL RATES MANAGEMENT</span></div>
           <div style="background:#FFF; padding:20px; border:1px solid #CCD4BF; border-radius:6px; max-width:800px;">
@@ -612,7 +612,7 @@
           </div>
         </div>
 
-        <!-- 7. CASUAL & PRISONER DIETS -->
+        <!-- 7. CASUAL & PRISONER -->
         <div id="casualPrisonerView" class="subview" style="display:none;">
           <div class="panel-title"><span>CASUAL DIET & PRISONER (RI) REGISTERS</span></div>
           <div style="margin-bottom:24px;">
@@ -679,7 +679,7 @@
             <div style="background:#FFF; padding:14px; border:1px solid #CCD4BF; border-radius:6px; margin-bottom:16px;">
               <h4 style="color:var(--og-dark); margin-bottom:8px;">GOOGLE SHEET SYNC & DRIVE:</h4>
               <div style="display:flex; gap:10px;">
-                <button class="btn btn-gold" onclick="forceSyncToSheet()">SYNC NOW TO SHEET</button>
+                <button class="btn btn-gold" onclick="forceSyncToSheet()">🟢 SYNC NOW TO SHEET</button>
                 <button class="btn" onclick="exportBackupJSON()">DOWNLOAD JSON BACKUP</button>
                 <button class="btn" onclick="openDriveLink()">OPEN GOOGLE DRIVE</button>
               </div>
@@ -709,9 +709,9 @@
 <div class="modal-overlay" id="memberModalOverlay">
   <div class="modal-box">
     <div class="panel-title" style="margin-bottom:10px;"><span>MEMBER REGISTRATION FORM</span><button class="btn btn-danger btn-sm" onclick="closeMemberModal()">X</button></div>
-    <div class="form-group"><label>IRLA / REGT NO (कोमा से अलग करें):</label><input type="text" id="modalRegt" class="form-control" placeholder="04125001, 04125002"></div>
+    <div class="form-group"><label>IRLA / REGT NO (कमा से अलग करें):</label><input type="text" id="modalRegt" class="form-control" placeholder="04125001, 04125002"></div>
     <div class="form-group"><label>RANK:</label><input type="text" id="modalRank" class="form-control" placeholder="CT / HC / SI"></div>
-    <div class="form-group"><label>NAME(S) (कोमा से अलग करें):</label><input type="text" id="modalName" class="form-control" placeholder="RAMESH SINGH, AMIT KUMAR"></div>
+    <div class="form-group"><label>NAME(S) (कमा से अलग करें):</label><input type="text" id="modalName" class="form-control" placeholder="RAMESH SINGH, AMIT KUMAR"></div>
     <div class="form-group">
       <label>SELECT COY / SUB-UNIT:</label>
       <select id="modalCoy" class="form-control">
@@ -754,7 +754,7 @@
 
 <script>
 // Yahan apna Google Apps Script Web App URL paste karein:
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxq1mU3MGEJtM3f56MI7LJvEl-5mxeoN9d-5h_ReFB_BbmLn19bMkEwkCbPADDhbKo/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGWehcr_OVoZs51L02uGKkRJmelQTl_yIl8YUCYeMpFGgZBjNKJF0Y0HqoA0roaILp/exec";
 
 let globalMessStore = {
   "A Coy Mess": createEmptyMessState(),
@@ -795,7 +795,7 @@ function createEmptyMessState() {
   };
 }
 
-// Offline-First Sync Engine with Row-by-Row Sheet Append
+// 🛡️ 100% SECURE NO-ERASE OFFLINE-FIRST SYNC ENGINE
 let isOnline = navigator.onLine;
 
 window.addEventListener('online', () => {
@@ -818,18 +818,32 @@ function loadFromGoogleSheet(callback) {
     .then(response => response.json())
     .then(parsed => {
       if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
-        globalMessStore = Object.assign({}, globalMessStore, parsed);
-        if (globalMessStore[activeMessName]) {
-          state = globalMessStore[activeMessName];
+        let hasValidData = false;
+        for (let mKey in parsed) {
+          if (parsed[mKey] && parsed[mKey].members && parsed[mKey].members.length > 0) {
+            hasValidData = true;
+            break;
+          }
         }
-        saveSavedStateLocally();
-        if (callback) callback();
+        // Safety guard: Agar sheet par valid data hai tabhi local data me merge karo
+        if (hasValidData || JSON.stringify(parsed).length > 500) {
+          globalMessStore = Object.assign({}, globalMessStore, parsed);
+          if (globalMessStore[activeMessName]) {
+            state = globalMessStore[activeMessName];
+          }
+          saveSavedStateLocally();
+          if (callback) callback();
+        }
       }
     })
     .catch(e => console.log("Offline mode: Sheet fetch skipped."));
 }
 
 function saveToGoogleSheet() {
+  if (!state || (state.members.length === 0 && Object.keys(state.attendanceMap).length === 0)) {
+    return; // Khali state save nahi hogi
+  }
+
   globalMessStore[activeMessName] = state;
   saveSavedStateLocally();
 
@@ -852,13 +866,13 @@ function saveToGoogleSheet() {
 
 function syncPendingDataToSheet() {
   if (localStorage.getItem('bsf_pending_sync') === 'true') {
+    if (!state || state.members.length === 0) return;
     globalMessStore[activeMessName] = state;
     const payload = JSON.stringify(globalMessStore);
     const syncUrl = `${GOOGLE_SCRIPT_URL}?data=${encodeURIComponent(payload)}`;
     fetch(syncUrl, { mode: 'no-cors' })
       .then(() => {
         localStorage.removeItem('bsf_pending_sync');
-        console.log("Pending offline data successfully appended to Google Sheet!");
       })
       .catch(() => {});
   }
@@ -866,7 +880,7 @@ function syncPendingDataToSheet() {
 
 function forceSyncToSheet() {
   saveToGoogleSheet();
-  alert("डेटा सफलतापूर्वक Google Sheet पर सिंक हो गया है!");
+  alert("डेटा सफलतापूर्वक Google Sheet पर सिंक (Append) हो गया है!");
 }
 
 function saveSavedStateLocally() {
@@ -880,8 +894,11 @@ function loadSavedStateLocally() {
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
-      if (parsed && typeof parsed === 'object') {
+      if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
         globalMessStore = { ...globalMessStore, ...parsed };
+        if (globalMessStore[activeMessName]) {
+          state = globalMessStore[activeMessName];
+        }
       }
     } catch(e) {}
   }
@@ -1482,6 +1499,15 @@ function renderAttendanceMatrix() {
   const selectedCoy = coyFilter.value;
   const activeMembers = state.members.filter(m => m.coy === selectedCoy && !m.archived);
   
+  // 🔒 SECURITY CHECK: Mess NCO cannot edit past months (Read-Only Lock)
+  let isNCOLocked = false;
+  if (state.currentUser === "NCO") {
+    const todayStr = new Date().toISOString().split('T')[0];
+    if (state.cycleEndDate < todayStr) {
+      isNCOLocked = true;
+    }
+  }
+
   const headerRow = document.getElementById("matrixHeaderRow");
   if (!headerRow) return;
   let hHtml = `<th class="sticky-col">REGT NO</th><th class="sticky-col" style="left:75px;">RANK & NAME</th>`;
@@ -1502,7 +1528,12 @@ function renderAttendanceMatrix() {
         if (state.attendanceMap[key] === undefined) state.attendanceMap[key] = 1.0;
         const val = state.attendanceMap[key];
         memDiets += parseFloat(val) || 0;
-        bHtml += `<td><input type="number" step="0.1" min="0" max="2" value="${val}" class="diet-input" onchange="updateDietVal('${m.regt}', ${idx}, this.value)"></td>`;
+        
+        if (isNCOLocked) {
+          bHtml += `<td><input type="number" value="${val}" class="diet-input" disabled style="background:#E0E0E0; cursor:not-allowed;" title="Locked: Mess NCO cannot edit past months!"></td>`;
+        } else {
+          bHtml += `<td><input type="number" step="0.1" min="0" max="2" value="${val}" class="diet-input" onchange="updateDietVal('${m.regt}', ${idx}, this.value)"></td>`;
+        }
       });
       const actualAmt = memDiets * state.dailyRate, roundAmt = Math.round(actualAmt);
       coyTotDiets += memDiets; coyTotRound += roundAmt;
