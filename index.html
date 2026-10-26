@@ -754,7 +754,7 @@
 
 <script>
 // Yahan apna Google Apps Script Web App URL paste karein:
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGWehcr_OVoZs51L02uGKkRJmelQTl_yIl8YUCYeMpFGgZBjNKJF0Y0HqoA0roaILp/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8BPtJgg7gvrcQGG1yAnN6QeA1u4NnDAIVbBsgn_z1bfysAHUsYxMhcRO73DHQ9Zo4/exec";
 
 let globalMessStore = {
   "A Coy Mess": createEmptyMessState(),
@@ -825,7 +825,6 @@ function loadFromGoogleSheet(callback) {
             break;
           }
         }
-        // Safety guard: Agar sheet par valid data hai tabhi local data me merge karo
         if (hasValidData || JSON.stringify(parsed).length > 500) {
           globalMessStore = Object.assign({}, globalMessStore, parsed);
           if (globalMessStore[activeMessName]) {
@@ -841,7 +840,7 @@ function loadFromGoogleSheet(callback) {
 
 function saveToGoogleSheet() {
   if (!state || (state.members.length === 0 && Object.keys(state.attendanceMap).length === 0)) {
-    return; // Khali state save nahi hogi
+    return;
   }
 
   globalMessStore[activeMessName] = state;
@@ -880,7 +879,7 @@ function syncPendingDataToSheet() {
 
 function forceSyncToSheet() {
   saveToGoogleSheet();
-  alert("डेटा सफलतापूर्वक Google Sheet पर सिंक (Append) हो गया है!");
+  console.log("Data successfully synced to Google Sheet!");
 }
 
 function saveSavedStateLocally() {
@@ -927,13 +926,14 @@ function handleFileImport(event) {
         }
         state = globalMessStore[activeMessName];
         saveState();
+        forceSyncToSheet();
         if (state.currentUser) {
           initSystem();
         } else {
           populateLifetimeCycleSelector();
           onCycleChange();
         }
-        alert("डेटा सफलतापूर्वक रीस्टोर (Restore) कर लिया गया है!");
+        alert("डेटा सफलतापूर्वक रीस्टोर (Restore) और सिंक कर लिया गया है!");
       } else {
         alert("अमान्य बैकअप फाइल!");
       }
@@ -1097,8 +1097,9 @@ function saveAndLockRates() {
   renderAttendanceMatrix();
   recalcAll();
   saveState();
+  forceSyncToSheet();
   logAudit("RATES_LOCK", `Locked daily diet rate & casual rates for month ${cycleKey}`);
-  alert(`${activeMessName} के लिए सभी रेट्स सफलतापूर्वक लॉक कर दिए गए हैं।`);
+  alert(`${activeMessName} के लिए सभी रेट्स सफलतापूर्वक लॉक और सिंक कर दिए गए हैं।`);
 }
 
 function handleLogin() {
@@ -1170,12 +1171,14 @@ function changeMyPasswordPrompt() {
   }
   state.passwords[state.currentUser] = newPin;
   saveState();
+  forceSyncToSheet();
   logAudit("PASSWORD_CHANGE", `Password changed for role ${state.currentUser}`);
   alert("पासवर्ड सफलतापूर्वक बदल दिया गया है!");
 }
 
 function logout() {
   saveToGoogleSheet();
+  forceSyncToSheet();
   state.currentUser = null;
   document.getElementById("workspaceSection").style.display = "none";
   document.getElementById("authStrip").style.display = "none";
@@ -1192,7 +1195,7 @@ function switchView(viewId) {
   recalcAll();
 }
 
-/* MODAL REGISTRATION FUNCTIONS */
+/* MODAL REGISTRATION FUNCTIONS (WITH AUTO SYNC) */
 function openMemberModal() {
   document.getElementById("memberModalOverlay").style.display = "flex";
 }
@@ -1225,8 +1228,10 @@ function submitMemberModal() {
   renderAttendanceMatrix();
   recalcAll();
   saveState();
+  forceSyncToSheet(); // 🟢 Turant Google Sheet par sync karega
+
   logAudit("MEMBER_ADD", `Registered ${added} members in ${activeMessName}`);
-  alert(`${added} जवान ${activeMessName} में सफलतापूर्वक रजिस्टर हो गए हैं।`);
+  alert(`${added} जवान ${activeMessName} में सफलतापूर्वक रजिस्टर और गूगल शीट पर सिंक हो गए हैं।`);
 }
 
 /* PRISONER MODAL FUNCTIONS */
@@ -1258,8 +1263,9 @@ function submitPrisonerModal() {
   renderCasualAndPrisoners();
   recalcAll();
   saveState();
+  forceSyncToSheet();
   logAudit("PRISONER_ADD", `Added prisoner record for ${rankName} in ${activeMessName}`);
-  alert(`कैदी रिकॉर्ड सफलतापूर्वक जोड़ दिया गया है (${diets} दिन)।`);
+  alert(`कैदी रिकॉर्ड सफलतापूर्वक जोड़ और सिंक दिया गया है (${diets} दिन)।`);
 }
 
 function addCasualModalOpen() {
@@ -1281,6 +1287,7 @@ function addCasualModalOpen() {
   renderCasualAndPrisoners();
   recalcAll();
   saveState();
+  forceSyncToSheet();
   logAudit("CASUAL_ADD", `Added casual diet for ${rankName} in ${activeMessName}`);
 }
 
@@ -1371,14 +1378,14 @@ function renderDryRation() {
   if (document.getElementById("dryTotalNextAmt")) document.getElementById("dryTotalNextAmt").innerText = `₹${totNextAmt.toFixed(2)}`;
 }
 
-function updateDryNextQty(idx, val) { state.dryRation[idx].nextQty = parseFloat(val) || 0; renderDryRation(); recalcAll(); saveState(); }
+function updateDryNextQty(idx, val) { state.dryRation[idx].nextQty = parseFloat(val) || 0; renderDryRation(); recalcAll(); saveState(); forceSyncToSheet(); }
 
 function addOpeningBatchPrompt(idx) {
   const item = state.dryRation[idx];
   const qty = parseFloat(prompt(`Enter Last Month Balance/Opening Qty (${item.unit}):`)); if (isNaN(qty) || qty <= 0) return;
   const rate = parseFloat(prompt(`Enter Opening Rate per ${item.unit} (₹):`)); if (isNaN(rate) || rate < 0) return;
   item.recBatches.push({ qty, rate });
-  renderDryRation(); recalcAll(); saveState();
+  renderDryRation(); recalcAll(); saveState(); forceSyncToSheet();
   logAudit("DRY_OPENING_BATCH", `Added opening batch to ${item.item}: ${qty} @ ${rate}`);
 }
 
@@ -1386,17 +1393,17 @@ function addPurchaseBatchPrompt(idx) {
   const item = state.dryRation[idx];
   const qty = parseFloat(prompt(`Enter Purchased Qty (${item.unit}):`)); if (isNaN(qty) || qty <= 0) return;
   const rate = parseFloat(prompt(`Enter Purchase Rate per ${item.unit} (₹):`)); if (isNaN(rate) || rate < 0) return;
-  item.purBatches.push({ qty, rate }); renderDryRation(); recalcAll(); saveState();
+  item.purBatches.push({ qty, rate }); renderDryRation(); recalcAll(); saveState(); forceSyncToSheet();
 }
 
 function addNewDryItem() {
   const item = (prompt("Enter Item Name:") || "").toUpperCase(); if (!item) return;
   const unit = (prompt("Unit:", "kg") || "kg").toLowerCase();
   state.dryRation.push({ item, unit, recBatches: [], purBatches: [], nextQty: 0 });
-  renderDryRation(); recalcAll(); saveState();
+  renderDryRation(); recalcAll(); saveState(); forceSyncToSheet();
 }
 
-function deleteDryItemPrompt(idx) { if (confirm("Delete?")) { state.dryRation.splice(idx, 1); renderDryRation(); recalcAll(); saveState(); } }
+function deleteDryItemPrompt(idx) { if (confirm("Delete?")) { state.dryRation.splice(idx, 1); renderDryRation(); recalcAll(); saveState(); forceSyncToSheet(); } }
 
 function rollOverDryRation() {
   if (confirm("NEXT MONTH ROLLOVER:\nक्या आप बचे हुए बैलेंस को अगले महीने का ओपनिंग बैलेंस बनाना चाहते हैं?")) {
@@ -1406,8 +1413,8 @@ function rollOverDryRation() {
       r.purBatches = [];
       r.nextQty = 0;
     });
-    renderDryRation(); recalcAll(); saveState();
-    alert("Rollover Complete! Next month opening balance updated.");
+    renderDryRation(); recalcAll(); saveState(); forceSyncToSheet();
+    alert("Rollover Complete! Next month opening balance updated and synced.");
   }
 }
 
@@ -1419,7 +1426,7 @@ function updateFreshSummary() {
   state.freshRationData = { recAmt: rec, purAmt: pur, nextAmt: next };
   if (document.getElementById("freshGTotalCell")) document.getElementById("freshGTotalCell").innerText = `₹${gTotal.toFixed(2)}`;
   if (document.getElementById("freshExpCell")) document.getElementById("freshExpCell").innerText = `₹${exp.toFixed(2)}`;
-  recalcAll(); saveState();
+  recalcAll(); saveState(); forceSyncToSheet();
 }
 
 function downloadTemplateCSV() {
@@ -1445,7 +1452,8 @@ function handleStrictExcelUpload(event) {
       }
     }
     renderMembers(); renderAttendanceMatrix(); recalcAll(); saveState();
-    alert(`सफलतापूर्वक ${added} मेंबर अपलोड और सिंक हो गए हैं।`);
+    forceSyncToSheet(); // 🟢 Turant Google Sheet par sync karega
+    alert(`सफलतापूर्वक ${added} मेंबर अपलोड और गूगल शीट पर सिंक हो गए हैं।`);
   };
   reader.readAsText(file);
 }
@@ -1464,7 +1472,7 @@ function renderMembers() {
   tbody.innerHTML = html;
 }
 
-function deleteMember(idx) { state.members.splice(idx, 1); renderMembers(); renderAttendanceMatrix(); recalcAll(); saveState(); }
+function deleteMember(idx) { state.members.splice(idx, 1); renderMembers(); renderAttendanceMatrix(); recalcAll(); saveState(); forceSyncToSheet(); }
 
 function renderCasualAndPrisoners() {
   const cBody = document.getElementById("casualTableBody");
@@ -1488,9 +1496,9 @@ function renderCasualAndPrisoners() {
   }
 }
 
-function toggleCasualPaid(idx) { state.casualDiets[idx].paid = !state.casualDiets[idx].paid; renderCasualAndPrisoners(); saveState(); }
-function deleteCasual(idx) { state.casualDiets.splice(idx, 1); renderCasualAndPrisoners(); recalcAll(); saveState(); }
-function deletePrisoner(idx) { state.prisoners.splice(idx, 1); renderCasualAndPrisoners(); recalcAll(); saveState(); }
+function toggleCasualPaid(idx) { state.casualDiets[idx].paid = !state.casualDiets[idx].paid; renderCasualAndPrisoners(); saveState(); forceSyncToSheet(); }
+function deleteCasual(idx) { state.casualDiets.splice(idx, 1); renderCasualAndPrisoners(); recalcAll(); saveState(); forceSyncToSheet(); }
+function deletePrisoner(idx) { state.prisoners.splice(idx, 1); renderCasualAndPrisoners(); recalcAll(); saveState(); forceSyncToSheet(); }
 
 function renderAttendanceMatrix() {
   const dates = getCycleDates();
@@ -1554,14 +1562,21 @@ function renderAttendanceMatrix() {
   }
 }
 
-function updateDietVal(regt, dayIdx, val) { state.attendanceMap[`${regt}_d${dayIdx}`] = parseFloat(val) || 0; renderAttendanceMatrix(); recalcAll(); saveState(); }
+function updateDietVal(regt, dayIdx, val) { 
+  state.attendanceMap[`${regt}_d${dayIdx}`] = parseFloat(val) || 0; 
+  renderAttendanceMatrix(); 
+  recalcAll(); 
+  saveState(); 
+  forceSyncToSheet(); // Attendance badalte hi sync karega
+}
+
 function bulkFillAll(val) {
   const dates = getCycleDates();
   const selectedCoy = document.getElementById("attendanceCoyFilter").value;
   state.members.filter(m => m.coy === selectedCoy && !m.archived).forEach(m => {
     dates.forEach((d, idx) => { state.attendanceMap[`${m.regt}_d${idx}`] = val; });
   });
-  renderAttendanceMatrix(); recalcAll(); saveState();
+  renderAttendanceMatrix(); recalcAll(); saveState(); forceSyncToSheet();
 }
 
 function recalcAll() {
